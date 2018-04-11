@@ -57,7 +57,7 @@ public class RecipeStepsDetailFragment extends Fragment {
     private Handler mainHandler;
     ArrayList<Recipes> recipe;
     String recipeName;
-    private static final String EXO_CURRENT_POSITION = "current_position";
+    private static final String EXO_CURRENT_POSITION =  "current_position";
     private long exo_current_position = C.TIME_UNSET;
     Uri videoURL;
 
