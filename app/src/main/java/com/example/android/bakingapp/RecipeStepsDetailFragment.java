@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.LoadControl;
@@ -47,6 +48,7 @@ import static com.example.android.bakingapp.RecipeActivity.SELECTED_STEPS;
  */
 
 public class RecipeStepsDetailFragment extends Fragment {
+
     private SimpleExoPlayerView simpleExoPlayerView;
     private SimpleExoPlayer player;
     private BandwidthMeter bandwidthMeter;
@@ -55,6 +57,9 @@ public class RecipeStepsDetailFragment extends Fragment {
     private Handler mainHandler;
     ArrayList<Recipes> recipe;
     String recipeName;
+    private static final String EXO_CURRENT_POSITION = "current_position";
+    private long exo_current_position = C.TIME_UNSET;
+    Uri videoURL;
 
     public RecipeStepsDetailFragment() {
     }
@@ -77,8 +82,7 @@ public class RecipeStepsDetailFragment extends Fragment {
             steps = savedInstanceState.getParcelableArrayList(SELECTED_STEPS);
             selectedIndex = savedInstanceState.getInt(SELECTED_INDEX);
             recipeName = savedInstanceState.getString("Title");
-
-
+            exo_current_position = savedInstanceState.getLong(EXO_CURRENT_POSITION,C.TIME_UNSET);
         } else {
             steps = getArguments().getParcelableArrayList(SELECTED_STEPS);
             if (steps != null) {
@@ -103,7 +107,7 @@ public class RecipeStepsDetailFragment extends Fragment {
         simpleExoPlayerView = (SimpleExoPlayerView) rootView.findViewById(R.id.playerView);
         simpleExoPlayerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
 
-        String videoURL = steps.get(selectedIndex).getVideoURL();
+        videoURL = Uri.parse(steps.get(selectedIndex).getVideoURL());
 
         if (rootView.findViewWithTag("sw600dp-port-recipe_step_detail") != null) {
             recipeName = ((RecipeDetailActivity) getActivity()).recipeName;
@@ -117,7 +121,7 @@ public class RecipeStepsDetailFragment extends Fragment {
             Picasso.with(getContext()).load(builtUri).into(thumbImage);
         }
 
-        if (!videoURL.isEmpty()) {
+        if (videoURL != null) {
 
 
             initializePlayer(Uri.parse(steps.get(selectedIndex).getVideoURL()));
@@ -146,7 +150,7 @@ public class RecipeStepsDetailFragment extends Fragment {
                     }
                     itemClickListener.onListItemClick(steps, steps.get(selectedIndex).getId() - 1, recipeName);
                 } else {
-                    Toast.makeText(getActivity(), "You already are in the First step of the recipe", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "You're already in the First step of recipe", Toast.LENGTH_SHORT).show();
 
                 }
             }
@@ -162,7 +166,7 @@ public class RecipeStepsDetailFragment extends Fragment {
                     }
                     itemClickListener.onListItemClick(steps, steps.get(selectedIndex).getId() + 1, recipeName);
                 } else {
-                    Toast.makeText(getContext(), "You already are in the Last step of the recipe", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "You're already in the last step of recipe", Toast.LENGTH_SHORT).show();
 
                 }
             }
@@ -184,7 +188,11 @@ public class RecipeStepsDetailFragment extends Fragment {
             simpleExoPlayerView.setPlayer(player);
 
             String userAgent = Util.getUserAgent(getContext(), "Baking App");
-            MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
+            MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new
+                    DefaultDataSourceFactory(getContext(), userAgent),
+                    new DefaultExtractorsFactory(), null, null);
+            if (exo_current_position != C.TIME_UNSET)
+                player.seekTo(exo_current_position);
             player.prepare(mediaSource);
             player.setPlayWhenReady(true);
         }
@@ -193,50 +201,34 @@ public class RecipeStepsDetailFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle currentState) {
         super.onSaveInstanceState(currentState);
-        currentState.putParcelableArrayList(SELECTED_STEPS,steps);
-        currentState.putInt(SELECTED_INDEX,selectedIndex);
-        currentState.putString("Title",recipeName);
+        currentState.putParcelableArrayList(SELECTED_STEPS, steps);
+        currentState.putInt(SELECTED_INDEX, selectedIndex);
+        currentState.putString("Title", recipeName);
+        currentState.putLong(EXO_CURRENT_POSITION, exo_current_position);
     }
 
-    public boolean isInLandscapeMode( Context context ) {
+    public boolean isInLandscapeMode(Context context) {
         return (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
     }
 
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        if (player!=null) {
-            player.stop();
-            player.release();
-        }
-    }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (player!=null) {
-            player.stop();
-            player.release();
-            player=null;
-        }
+    public void onResume() {
+        super.onResume();
+        if (videoURL != null)
+            initializePlayer(videoURL);
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (player!=null) {
-            player.stop();
-            player.release();
-        }
-    }
 
     @Override
     public void onPause() {
         super.onPause();
-        if (player!=null) {
+        if (player != null) {
+            exo_current_position = player.getCurrentPosition();
             player.stop();
             player.release();
+            player = null;
         }
     }
 

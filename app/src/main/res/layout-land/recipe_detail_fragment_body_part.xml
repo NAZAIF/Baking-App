@@ -9,6 +9,7 @@
 
 
     <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="286dp"
         android:layout_height="wrap_content"
         android:scrollbarStyle="insideInset"
