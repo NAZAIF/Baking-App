@@ -57,7 +57,7 @@ public class RecipeStepsDetailFragment extends Fragment {
     private Handler mainHandler;
     ArrayList<Recipes> recipe;
     String recipeName;
-    private static final String EXO_CURRENT_POSITION =  "current_position";
+    private static final String EXO_CURRENT_POSITION = "current_position";
     private long exo_current_position = C.TIME_UNSET;
     Uri videoURL;
 
@@ -82,7 +82,7 @@ public class RecipeStepsDetailFragment extends Fragment {
             steps = savedInstanceState.getParcelableArrayList(SELECTED_STEPS);
             selectedIndex = savedInstanceState.getInt(SELECTED_INDEX);
             recipeName = savedInstanceState.getString("Title");
-            exo_current_position = savedInstanceState.getLong(EXO_CURRENT_POSITION,C.TIME_UNSET);
+            exo_current_position = savedInstanceState.getLong(EXO_CURRENT_POSITION, C.TIME_UNSET);
         } else {
             steps = getArguments().getParcelableArrayList(SELECTED_STEPS);
             if (steps != null) {
@@ -91,7 +91,6 @@ public class RecipeStepsDetailFragment extends Fragment {
                 recipeName = getArguments().getString("Title");
             } else {
                 recipe = getArguments().getParcelableArrayList(SELECTED_RECIPES);
-                //casting List to ArrayList
                 steps = (ArrayList<Steps>) recipe.get(0).getSteps();
                 selectedIndex = 0;
             }
@@ -210,7 +209,6 @@ public class RecipeStepsDetailFragment extends Fragment {
     public boolean isInLandscapeMode(Context context) {
         return (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
     }
-
 
 
     @Override

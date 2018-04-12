@@ -1,8 +1,10 @@
 package com.example.android.bakingapp;
 
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,6 +27,7 @@ public class RecipeDetailFragment extends Fragment {
 
     public RecipeDetailFragment(){}
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         RecyclerView recyclerView;
@@ -35,8 +38,7 @@ public class RecipeDetailFragment extends Fragment {
         if(savedInstanceState != null) {
             recipe = savedInstanceState.getParcelableArrayList(SELECTED_RECIPES);
 
-        }
-        else {
+        } else {
             recipe =getArguments().getParcelableArrayList(SELECTED_RECIPES);
         }
 
