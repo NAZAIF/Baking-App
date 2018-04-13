@@ -27,13 +27,13 @@ public class RecipeDetailFragment extends Fragment {
 
     public RecipeDetailFragment(){}
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         RecyclerView recyclerView;
         TextView textView;
 
         recipe = new ArrayList<>();
+
 
         if(savedInstanceState != null) {
             recipe = savedInstanceState.getParcelableArrayList(SELECTED_RECIPES);
@@ -51,16 +51,18 @@ public class RecipeDetailFragment extends Fragment {
         ArrayList<String> recipeIngredientsForWidgets= new ArrayList<>();
 
 
-        ingredients.forEach((a) ->
-        {
-            textView.append("\u2022 "+ a.getIngredient()+"\n");
-            textView.append("\t\t\t Quantity: "+a.getQuantity().toString()+"\n");
-            textView.append("\t\t\t Measure: "+a.getMeasure()+"\n\n");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            ingredients.forEach((a) ->
+            {
+                textView.append("\u2022 " + a.getIngredient() + "\n");
+                textView.append("\t\t\t Quantity: " + a.getQuantity().toString() + "\n");
+                textView.append("\t\t\t Measure: " + a.getMeasure() + "\n\n");
 
-            recipeIngredientsForWidgets.add(a.getIngredient()+"\n"+
-                    "Quantity: "+a.getQuantity().toString()+"\n"+
-                    "Measure: "+a.getMeasure()+"\n");
-        });
+                recipeIngredientsForWidgets.add(a.getIngredient() + "\n" +
+                        "Quantity: " + a.getQuantity().toString() + "\n" +
+                        "Measure: " + a.getMeasure() + "\n");
+            });
+        }
 
         recyclerView=(RecyclerView)rootView.findViewById(R.id.recipe_detail_recycler);
         LinearLayoutManager mLayoutManager=new LinearLayoutManager(getContext());
@@ -74,7 +76,6 @@ public class RecipeDetailFragment extends Fragment {
 
         return rootView;
     }
-
 
     @Override
     public void onSaveInstanceState(Bundle currentState) {

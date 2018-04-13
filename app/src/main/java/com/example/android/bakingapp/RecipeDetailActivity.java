@@ -16,10 +16,10 @@ public class RecipeDetailActivity extends AppCompatActivity implements RecipeDet
     static String SELECTED_INDEX = "Selected_Index";
     static String STACK_RECIPE_DETAIL = "STACK_RECIPE_DETAIL";
     static String STACK_RECIPE_STEP_DETAIL = "STACK_RECIPE_STEP_DETAIL";
+    static String ALL_RECIPES = "All_Recipes";
 
     private ArrayList<Recipes> recipe;
     String recipeName;
-
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +78,6 @@ public class RecipeDetailActivity extends AppCompatActivity implements RecipeDet
 
 
                 } else {
-
                     finish();
 
                 }
@@ -87,19 +86,6 @@ public class RecipeDetailActivity extends AppCompatActivity implements RecipeDet
         });
     }
 
-    @Override
-    public void onBackPressed() {
-        int fragments = getSupportFragmentManager().getBackStackEntryCount();
-        if (fragments == 1) {
-            finish();
-        } else {
-            if (getFragmentManager().getBackStackEntryCount() > 1) {
-                getFragmentManager().popBackStack();
-            } else {
-                super.onBackPressed();
-            }
-        }
-    }
 
     @Override
     public void onListItemClick(List<Steps> stepsOut, int selectedItemIndex, String recipeName) {
@@ -129,11 +115,11 @@ public class RecipeDetailActivity extends AppCompatActivity implements RecipeDet
 
     }
 
-
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString("Title", recipeName);
     }
+
 
 }

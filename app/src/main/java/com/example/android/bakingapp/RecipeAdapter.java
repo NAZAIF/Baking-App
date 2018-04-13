@@ -3,6 +3,7 @@ package com.example.android.bakingapp;
 import android.content.Context;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,7 +49,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecyclerVi
     public void onBindViewHolder(RecipeAdapter.RecyclerViewHolder holder, int position) {
         holder.textRecyclerView.setText(recipes.get(position).getName());
         String imageUrl = recipes.get(position).getImage();
-        if (imageUrl != ""){
+        if (!TextUtils.isEmpty(imageUrl)) {
             Uri builtUri = Uri.parse(imageUrl).buildUpon().build();
             Picasso.with(mContext).load(builtUri).into(holder.imageRecyclerView);
         }

@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -25,26 +26,24 @@ import static com.example.android.bakingapp.RecipeActivity.ALL_RECIPES;
 
 public class RecipesFragment extends Fragment {
 
-    public RecipesFragment(){}
+    public RecipesFragment() {
+    }
 
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         RecyclerView recyclerView;
 
         View rootView = inflater.inflate(R.layout.recipe_fragment_body_part, container, false);
 
-        recyclerView=(RecyclerView)  rootView.findViewById(R.id.recipe_recycler);
-        RecipeAdapter recipesAdapter =new RecipeAdapter((RecipeActivity)getActivity());
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.recipe_recycler);
+        RecipeAdapter recipesAdapter = new RecipeAdapter((RecipeActivity) getActivity());
         recyclerView.setAdapter(recipesAdapter);
 
 
-
-        if (rootView.getTag()!=null && rootView.getTag().equals("phone-land")){
-            GridLayoutManager mLayoutManager = new GridLayoutManager(getContext(),4);
+        if (rootView.getTag() != null && rootView.getTag().equals("phone-land")) {
+            GridLayoutManager mLayoutManager = new GridLayoutManager(getContext(), 4);
             recyclerView.setLayoutManager(mLayoutManager);
-        }
-        else {
+        } else {
             LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext());
             recyclerView.setLayoutManager(mLayoutManager);
         }
@@ -52,7 +51,7 @@ public class RecipesFragment extends Fragment {
         RecipeInterface iRecipe = RetroBuilder.Retrieve();
         Call<ArrayList<Recipes>> recipe = iRecipe.getRecipe();
 
-        BakingIdlingResource idlingResource = (BakingIdlingResource)((RecipeActivity)getActivity()).getIdlingResource();
+        BakingIdlingResource idlingResource = (BakingIdlingResource) ((RecipeActivity) getActivity()).getIdlingResource();
 
         if (idlingResource != null) {
             idlingResource.setIdleState(false);
@@ -70,7 +69,7 @@ public class RecipesFragment extends Fragment {
                 Bundle recipesBundle = new Bundle();
                 recipesBundle.putParcelableArrayList(ALL_RECIPES, recipes);
 
-                recipesAdapter.setRecipeData(recipes,getContext());
+                recipesAdapter.setRecipeData(recipes, getContext());
                 if (idlingResource != null) {
                     idlingResource.setIdleState(true);
                 }
@@ -79,11 +78,10 @@ public class RecipesFragment extends Fragment {
 
             @Override
             public void onFailure(Call<ArrayList<Recipes>> call, Throwable t) {
-                Log.v("http fail: ", t.getMessage());
+                Toast.makeText(getContext(), "http fail: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 
         return rootView;
-
     }
 }

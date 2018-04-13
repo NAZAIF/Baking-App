@@ -59,7 +59,9 @@ public class RecipeStepsDetailFragment extends Fragment {
     String recipeName;
     private static final String EXO_CURRENT_POSITION = "current_position";
     private long exo_current_position = C.TIME_UNSET;
-    Uri videoURL;
+    String videoURL;
+    private static final String STATE = "state";
+    private boolean playWhenReady;
 
     public RecipeStepsDetailFragment() {
     }
@@ -79,6 +81,7 @@ public class RecipeStepsDetailFragment extends Fragment {
         itemClickListener = (RecipeDetailActivity) getActivity();
         recipe = new ArrayList<>();
         if (savedInstanceState != null) {
+            playWhenReady = savedInstanceState.getBoolean(STATE);
             steps = savedInstanceState.getParcelableArrayList(SELECTED_STEPS);
             selectedIndex = savedInstanceState.getInt(SELECTED_INDEX);
             recipeName = savedInstanceState.getString("Title");
@@ -106,7 +109,7 @@ public class RecipeStepsDetailFragment extends Fragment {
         simpleExoPlayerView = (SimpleExoPlayerView) rootView.findViewById(R.id.playerView);
         simpleExoPlayerView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
 
-        videoURL = Uri.parse(steps.get(selectedIndex).getVideoURL());
+        videoURL = steps.get(selectedIndex).getVideoURL();
 
         if (rootView.findViewWithTag("sw600dp-port-recipe_step_detail") != null) {
             recipeName = ((RecipeDetailActivity) getActivity()).recipeName;
@@ -120,7 +123,7 @@ public class RecipeStepsDetailFragment extends Fragment {
             Picasso.with(getContext()).load(builtUri).into(thumbImage);
         }
 
-        if (videoURL != null) {
+        if (!videoURL.isEmpty()) {
 
 
             initializePlayer(Uri.parse(steps.get(selectedIndex).getVideoURL()));
@@ -149,7 +152,7 @@ public class RecipeStepsDetailFragment extends Fragment {
                     }
                     itemClickListener.onListItemClick(steps, steps.get(selectedIndex).getId() - 1, recipeName);
                 } else {
-                    Toast.makeText(getActivity(), "You're already in the First step of recipe", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "You're already in first step of the recipe", Toast.LENGTH_SHORT).show();
 
                 }
             }
@@ -165,7 +168,7 @@ public class RecipeStepsDetailFragment extends Fragment {
                     }
                     itemClickListener.onListItemClick(steps, steps.get(selectedIndex).getId() + 1, recipeName);
                 } else {
-                    Toast.makeText(getContext(), "You're already in the last step of recipe", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "You're already in last step of the recipe", Toast.LENGTH_SHORT).show();
 
                 }
             }
@@ -173,8 +176,6 @@ public class RecipeStepsDetailFragment extends Fragment {
 
 
         return rootView;
-
-
     }
 
     private void initializePlayer(Uri mediaUri) {
@@ -187,13 +188,12 @@ public class RecipeStepsDetailFragment extends Fragment {
             simpleExoPlayerView.setPlayer(player);
 
             String userAgent = Util.getUserAgent(getContext(), "Baking App");
-            MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new
-                    DefaultDataSourceFactory(getContext(), userAgent),
-                    new DefaultExtractorsFactory(), null, null);
+            MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
+
             if (exo_current_position != C.TIME_UNSET)
                 player.seekTo(exo_current_position);
             player.prepare(mediaSource);
-            player.setPlayWhenReady(true);
+            player.setPlayWhenReady(playWhenReady);
         }
     }
 
@@ -203,6 +203,7 @@ public class RecipeStepsDetailFragment extends Fragment {
         currentState.putParcelableArrayList(SELECTED_STEPS, steps);
         currentState.putInt(SELECTED_INDEX, selectedIndex);
         currentState.putString("Title", recipeName);
+        currentState.putBoolean(STATE, playWhenReady);
         currentState.putLong(EXO_CURRENT_POSITION, exo_current_position);
     }
 
@@ -214,8 +215,8 @@ public class RecipeStepsDetailFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (videoURL != null)
-            initializePlayer(videoURL);
+        if (!videoURL.isEmpty())
+            initializePlayer(Uri.parse(videoURL));
     }
 
 
@@ -223,6 +224,7 @@ public class RecipeStepsDetailFragment extends Fragment {
     public void onPause() {
         super.onPause();
         if (player != null) {
+            playWhenReady = player.getPlayWhenReady();
             exo_current_position = player.getCurrentPosition();
             player.stop();
             player.release();
